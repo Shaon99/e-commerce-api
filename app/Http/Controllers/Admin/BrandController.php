@@ -167,6 +167,13 @@ class BrandController extends Controller
             if (!is_array($brandIds) || empty($brandIds)) {
                 return response()->json(['error' => 'Invalid brand IDs provided.'], 400);
             }
+            $brands = Brand::whereIn('id', $brandIds)->get();
+
+            foreach ($brands as $brand) {
+                if ($brand->image) {
+                    removeFile($brand->file_url);
+                }
+            }
             Brand::whereIn('id', $brandIds)->delete();
             return response()->json(['message' => 'Brands deleted successfully.']);
         } catch (Exception $e) {
