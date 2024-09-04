@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
 
 use App\Models\Brand;
 use App\Services\BrandService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Jobs\SendBrandCreatedEmail;
-use Illuminate\Support\Facades\Log;
 
 class BrandController extends Controller
 {
@@ -68,8 +68,6 @@ class BrandController extends Controller
                 'name' => $request->name,
                 'file_url' => $file_url
             ]);
-
-            SendBrandCreatedEmail::dispatch($brand);
 
             return response()->json([
                 'message' => 'Brand added successfully.'
