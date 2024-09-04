@@ -3,7 +3,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\Auth\AuthController;
 use App\Http\Controllers\Admin\{
     CategoryController,
-    BrandController
+    BrandController,
+    SubCategoryController
 };
 
 /*
@@ -28,6 +29,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/categories-status-update/{id}', [CategoryController::class, 'statusUpdate']); // Update an existing category
     Route::delete('/categories-delete/{category}', [CategoryController::class, 'destroy']); // Delete a category
     Route::post('/multiple-category-delete', [CategoryController::class, 'multipleCategoryDelete']); // Delete a category
+
+    //subcategory controller
+    Route::get('/all-categories', [SubCategoryController::class, 'categories']); // Fetch all categories
+
+    Route::get('/sub-categories', [SubCategoryController::class, 'index']); // Fetch all categories
+    Route::post('/sub-categories-store', [SubCategoryController::class, 'store']); // Store a new category
+    Route::post('/sub-categories/{category}', [SubCategoryController::class, 'update']); // Update an existing category
+    Route::put('/sub-categories-status-update/{id}', [SubCategoryController::class, 'statusUpdate']); // Update an existing category
+    Route::delete('/sub-categories-delete/{category}', [SubCategoryController::class, 'destroy']); // Delete a category
+    Route::post('/multiple-sub-category-delete', [SubCategoryController::class, 'multipleSubCategoryDelete']); // Delete a category
+
 
     //brand routes
     Route::resource('brands', BrandController::class);

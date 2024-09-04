@@ -104,12 +104,15 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         try {
+            if ($category->image) {
+                removeFile($category->image);
+            }
             $category->delete();
             return response()->json([
-                'message' => 'Category deleted successfully.',
+                'message' => 'category deleted successfully.',
             ], 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error deleting category'], 500);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Error deleting brand'], 500);
         }
     }
 
@@ -126,6 +129,13 @@ class CategoryController extends Controller
         try {
             if (!is_array($categoryIds) || empty($categoryIds)) {
                 return response()->json(['error' => 'Invalid category IDs provided.'], 400);
+            }
+            $categories = Category::whereIn('id', $categoryIds)->get();
+
+            foreach ($categories as $category) {
+                if ($category->image) {
+                    removeFile($category->image);
+                }
             }
             Category::whereIn('id', $categoryIds)->delete();
             return response()->json(['message' => 'Categories deleted successfully.']);
