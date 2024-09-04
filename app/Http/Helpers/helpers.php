@@ -6,7 +6,7 @@ function removeFile($path)
 
 function filePath($folder_name)
 {
-    return 'images/' . $folder_name;
+    return 'public/images/' . $folder_name;
 }
 
 function imageUploadWithoutCrop($file, $folderName, $oldFile)
