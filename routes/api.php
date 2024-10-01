@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -20,12 +21,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-    
-    // Route::post('/store-reviews', [CategoryController::class, 'storeReviews']);
 
+    Route::post('/store-reviews', [CategoryController::class, 'storeReviews']);
 });
 Route::get('/categories', [ProductController::class, 'fetchCategories']);
 Route::get('/brands', [ProductController::class, 'fetchBrands']);
 
-// Route::get('/reviews/{id}', [CategoryController::class, 'reviews']);
-
+Route::get('/reviews/{id}', [CategoryController::class, 'reviews']);
