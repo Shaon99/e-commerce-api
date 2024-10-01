@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Review;
 use App\Services\CategoryService;
 use Illuminate\Http\Request;
 use Exception;
@@ -166,79 +167,79 @@ class CategoryController extends Controller
         }
     }
 
-    // public function reviews($id)
-    // {
-    //     try {
-    //         // Fetch reviews with user data and group them by rating in a single query
-    //         $reviews = Review::with('user', 'reviewImages')
-    //             ->where('product_id', $id)
-    //             ->select('rating', \DB::raw('count(*) as count'))
-    //             ->groupBy('rating')
-    //             ->orderBy('rating', 'desc')
-    //             ->get();
+    public function reviews($id)
+    {
+        try {
+            // Fetch reviews with user data and group them by rating in a single query
+            $reviews = Review::with('user', 'reviewImages')
+                ->where('product_id', $id)
+                ->select('rating', \DB::raw('count(*) as count'))
+                ->groupBy('rating')
+                ->orderBy('rating', 'desc')
+                ->get();
 
-    //         // Calculate total reviews count and average rating
-    //         $totalReviewsCount = $reviews->sum('count');
-    //         $averageRating = $totalReviewsCount > 0
-    //             ? Review::where('product_id', $id)->avg('rating')
-    //             : 0;
+            // Calculate total reviews count and average rating
+            $totalReviewsCount = $reviews->sum('count');
+            $averageRating = $totalReviewsCount > 0
+                ? Review::where('product_id', $id)->avg('rating')
+                : 0;
 
-    //         // Initialize the star counts array with 0s
-    //         $starCounts = array_fill(1, 5, 0);
+            // Initialize the star counts array with 0s
+            $starCounts = array_fill(1, 5, 0);
 
-    //         // Fill in the star counts based on the grouped results
-    //         foreach ($reviews as $review) {
-    //             $starCounts[$review->rating] = $review->count;
-    //         }
+            // Fill in the star counts based on the grouped results
+            foreach ($reviews as $review) {
+                $starCounts[$review->rating] = $review->count;
+            }
 
-    //         // Fetch paginated reviews for frontend display
-    //         $paginatedReviews = Review::with('user','reviewImages')->where('product_id', $id)->paginate(5);
+            // Fetch paginated reviews for frontend display
+            $paginatedReviews = Review::with('user','reviewImages')->where('product_id', $id)->paginate(5);
 
-    //         return response()->json([
-    //             'data' => $paginatedReviews,
-    //             'totalReviewsCount' => $totalReviewsCount,
-    //             'average_rating' => round($averageRating, 1),
-    //             'star_counts' => array_reverse($starCounts, true), // Reverse to maintain 5 to 1 order
-    //         ], 200);
-    //     } catch (\Throwable $e) {
-    //         return response()->json([
-    //             'message' => 'Failed to get reviews',
-    //             'error' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
+            return response()->json([
+                'data' => $paginatedReviews,
+                'totalReviewsCount' => $totalReviewsCount,
+                'average_rating' => round($averageRating, 1),
+                'star_counts' => array_reverse($starCounts, true), // Reverse to maintain 5 to 1 order
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Failed to get reviews',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
-    // public function storeReviews(Request $request)
-    // {
-    //     try {
-    //         $validated = $request->validate([
-    //             'product_id' => 'required|integer',
-    //             'rating' => 'required|integer|between:1,5',
-    //             'description' => 'required|string',
-    //         ]);
+    public function storeReviews(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'product_id' => 'required|integer',
+                'rating' => 'required|integer|between:1,5',
+                'description' => 'required|string',
+            ]);
 
-    //         $validated['user_id'] = auth()->user()->id;
+            $validated['user_id'] = auth()->user()->id;
 
-    //         $review = Review::create($validated);
+            $review = Review::create($validated);
 
-    //         if ($request->hasFile('images')) {
-    //             foreach ($request->file('images') as $image) {
-    //                 $file_url = imageUploadWithoutCrop($image, 'reviewImages', null);
-    //                 $review->reviewImages()->create([
-    //                     'image_url' => $file_url,
-    //                 ]);
-    //             }
-    //         }
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $file_url = imageUploadWithoutCrop($image, 'reviewImages', null);
+                    $review->reviewImages()->create([
+                        'image_url' => $file_url,
+                    ]);
+                }
+            }
 
-    //         return response()->json([
-    //             'message' => 'Review added successfully.',
-    //         ], 201);
-    //     } catch (\Exception $e) {
-    //         // Handle the exception and return an error response
-    //         return response()->json([
-    //             'error' => 'An error occurred while adding the review.',
-    //             'message' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
+            return response()->json([
+                'message' => 'Review added successfully.',
+            ], 201);
+        } catch (\Exception $e) {
+            // Handle the exception and return an error response
+            return response()->json([
+                'error' => 'An error occurred while adding the review.',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
