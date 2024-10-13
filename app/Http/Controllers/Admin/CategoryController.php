@@ -49,7 +49,7 @@ class CategoryController extends Controller
                 'file' => 'mimes:jpg,jpeg,png,webp|max:2048',
             ]);
 
-            $file_url = imageUploadWithoutCrop($request->file, $this->folderName, null);
+            $file_url = cloudUpload($request->file, $this->folderName, null);
         }
 
         $category = Category::create([
@@ -81,7 +81,7 @@ class CategoryController extends Controller
                 $this->validate($request, [
                     'file' => 'mimes:jpg,jpeg,png,webp|max:2048',
                 ]);
-                $file_url = imageUploadWithoutCrop($request->file('file'), $this->folderName, $category->image);
+                $file_url = cloudUpload($request->file('file'), $this->folderName, $category->image);
             }
 
             $category->update([
@@ -106,7 +106,7 @@ class CategoryController extends Controller
     {
         try {
             if ($category->image) {
-                removeFile($category->image);
+                imageRemoveFromCloud($category->image, $this->folderName);
             }
             $category->delete();
             return response()->json([
@@ -135,7 +135,7 @@ class CategoryController extends Controller
 
             foreach ($categories as $category) {
                 if ($category->image) {
-                    removeFile($category->image);
+                    imageRemoveFromCloud($category->image, $this->folderName);
                 }
             }
             Category::whereIn('id', $categoryIds)->delete();
@@ -193,7 +193,7 @@ class CategoryController extends Controller
             }
 
             // Fetch paginated reviews for frontend display
-            $paginatedReviews = Review::with('user','reviewImages')->where('product_id', $id)->paginate(5);
+            $paginatedReviews = Review::with('user', 'reviewImages')->where('product_id', $id)->paginate(5);
 
             return response()->json([
                 'data' => $paginatedReviews,
